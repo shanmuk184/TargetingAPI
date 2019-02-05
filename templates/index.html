@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>My test page</title>
+    <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" />
+    <style>
+        table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+  display:table;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class= "form-group">
+            
+            <label for="hint">Search Location:</label>
+            <input type="text" id="hint" class="form-control" name="hint" />
+            <div id="tagsname"></div>
+            
+        {% block locations %}
+            <table>
+
+        <tr>
+            <th>key</th>
+            <th>name</th>
+            <th>region</th>
+            <th>region_id</th>
+            <th>country</th>
+            <th>country_code</th>
+        </tr>    
+        {% for location in locations %}
+            <tr> 
+            <td>{{location.key}}</td>
+            <td>{{location.name}}</td>
+            <td>{{location.region}}</td>
+            <td>{{location.region_id}}</td>
+            <td>{{location.country}}</td>
+            <td>{{location.country_code}}</td>
+            </tr>
+        {% endfor %}
+        {% endblock  %}
+
+        </div>
+            <br><br>
+        
+    
+        <div class= "form-group">
+            <label for="interest">Search interests:</label>
+            <input type="text" id="interest" class="form-control" name="interest" />
+            <div id="interests"></div>
+                        
+        {% block interests %}
+            <table>
+            
+        <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>path</th>
+            <th>topic</th>
+            <th>audience_size</th>
+        </tr>    
+        {% for interest in interests %}
+            <tr> 
+            <td>{{interest.id}}</td>
+            <td>{{interest.name}}</td>
+            <td>{{interest.path}}</td>
+            <td>{{interest.topic}}</td>
+            <td>{{interest.audience_size}}</td>
+            
+            </tr>
+        {% endfor %}
+        {% endblock  %}
+
+        </div>
+    </div>
+    
+<script type="text/javascript">
+
+    $(function() {
+        $("#hint").autocomplete({
+            source: "/search-location",
+            select: function( event, ui ) {
+
+                var saveData = $.ajax({
+                    type: 'POST',
+                    url: "http://localhost:8000/search-location/",
+                    data:{"term":ui.item.value},
+                    dataType: "text",
+                    success: function(resultData) {
+                        console.log("Save Complete")
+                        location.reload()  }
+                });
+                saveData.error(function() { alert("Something went wrong"); });
+                event.preventDefault();
+                $("#hint").val(ui.item.name );
+                $('#tagsname').append('<br>You selected: ' + ui.item.value);
+            }
+        });
+
+        $("#interest").autocomplete({
+            source: "/search-interest",
+            select: function( event, ui ) {
+                
+                var saveData = $.ajax({
+                    type: 'POST',
+                    url: "http://localhost:8000/search-interest/",
+                    data:{"term":ui.item.value},
+                    dataType: "text",
+                    success: function(resultData) {
+                        console.log("Save Complete")
+                        location.reload()  }
+                });
+                saveData.error(function() { alert("Something went wrong"); });
+                event.preventDefault();
+
+                $("#interest").val(ui.item.name );
+                $('#interests').append('<br>Your selected Interest: ' + ui.item.value);
+            }
+        });
+    });
+
+</script>
+
+</body>
+
+
+</html>
